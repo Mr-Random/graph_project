@@ -27,8 +27,14 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/%.h $(OBJDIR)
 $(OBJDIR)/%.o : $(SRCDIR)/%.c $(OBJDIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $(OBJDIR)/$*.o 
 
-clean:
-	rm -f $(OBJ)/*.o
+$(OBJDIR): 
+	mkdir $(OBJDIR)
+
+$(BINDIR): 
+	mkdir $(BINDIR)
+
+clean: 
+	rm $(OBJ)
 
 veryclean: clean
-		rm $(MAIN)
+	rm $(MAIN)
