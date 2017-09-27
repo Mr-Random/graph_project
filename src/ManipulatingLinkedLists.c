@@ -12,22 +12,17 @@
 
 
 void graph_create(struct Graph *self, int maxNode, bool directed) {
+    self->size = 0;
     self->nbMaxNodes = maxNode;
 
     self->array = malloc(maxNode*sizeof(struct Node));
-    int i, j;
-
-    for (i = 0; i < maxNode; i++) {
-        self->array[i].node = i+1;
-        self->array[i].adjList = NULL;
-    }
 
 }
 
 void graph_destroy (struct Graph *self) {
     int i, j;
 
-    for (i = 0; i < self->nbMaxNodes; i++) {
+    for (i = 0; i < self->size; i++) {
         if (self->array[i].adjList != NULL) {
 
             struct Neighbour* tmp;
@@ -39,9 +34,12 @@ void graph_destroy (struct Graph *self) {
                 free(tmp);
             }
         }
+        free(self->array[i].adjList);
     }
     free(self->array);
 }
+
+
 
 void graph_load (char file[]) {
     FILE * fp;
