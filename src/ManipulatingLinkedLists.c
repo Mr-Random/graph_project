@@ -11,18 +11,20 @@
 #include "ManipulatingLinkedLists.h"
 
 
+/* Function Create and Init Graf */
 void graph_create(struct Graph *self, int maxNode, bool directed) {
     self->size = 0;
     self->nbMaxNodes = maxNode;
+    self->isDirected = directed;
 
     self->array = malloc(maxNode*sizeof(struct Node));
-
 }
 
-void graph_destroy (struct Graph *self) {
-    int i, j;
 
-    for (i = 0; i < self->size; i++) {
+/* Function Destroy Graf and Free memory */
+void graph_destroy (struct Graph *self) {
+    
+    for (int i = 0; i < self->size; i++) {
         if (self->array[i].adjList != NULL) {
 
             struct Neighbour* tmp;
@@ -39,8 +41,7 @@ void graph_destroy (struct Graph *self) {
     free(self->array);
 }
 
-
-
+/* Function : Load a GRAF from a txt file */
 void graph_load (char file[]) {
     FILE * fp;
     char * line = NULL;
@@ -48,8 +49,10 @@ void graph_load (char file[]) {
     ssize_t read;
 
     fp = fopen(file, "r");
-    if (fp == NULL)
+    if (fp == NULL){
         exit(EXIT_FAILURE);
+        //stderr("Error !");
+    }
 
     while ((read = getline(&line, &len, fp)) != -1) {
         printf("Retrieved line of length %zu :\n", read);
@@ -57,7 +60,7 @@ void graph_load (char file[]) {
     }
 
     fclose(fp);
-    if (line)
+    if (line) 
         free(line);
     exit(EXIT_SUCCESS);
 }

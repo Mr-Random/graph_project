@@ -8,33 +8,19 @@
 #include <string.h>
 
 #include "ManipulatingGraph.h"
+#include "ManipulatingLinkedLists.h"
 
 void graph_add_node(struct Graph *self) {
 
     if (self->size == self->nbMaxNodes) {
         self->nbMaxNodes *= 2;
-        int *data = calloc(self->nbMaxNodes, sizeof(Node));
+        struct Node *data = calloc(self->nbMaxNodes, sizeof(Node));
         memcpy(data, self->array, self->size * sizeof(Node));
 
-        //libération de la mémoire de l'ancien tableau
-        int i;
-        for (i = 0; i < self->nbMaxNodes; i++) {
-            if (self->array[i].adjList != NULL) {
+        //Free old tab memory 
+        graph_destroy(self);
 
-                struct Neighbour* tmp;
-
-                while (self->array[i].adjList != NULL)
-                {
-                    tmp = self->array[i].adjList;
-                    self->array[i].adjList = self->array[i].adjList->nextNeighbour;
-                    free(tmp);
-                }
-            }
-            free(self->array[i].adjList);
-        }
-        free(self->array);
-
-        //nouveau tableau que l'on a créé
+        //Affected new data to array
         self->array = data;
     }
 
@@ -46,11 +32,12 @@ void graph_add_node(struct Graph *self) {
 void graph_add_edge(struct Graph *self, int src, int dest, int weight){
 
     if (src < 0 || src > self->size) {
-        printf("Source invalid");
+        printf("Source invalid !\n");
         return;
     }
+
     if (dest < 0 || dest > self->size) {
-        printf("Source invalid");
+        printf("Destination invalid !\n");
         return;
     }
 
@@ -65,24 +52,37 @@ void graph_add_edge(struct Graph *self, int src, int dest, int weight){
     }
 
     struct Neighbour *tmp  = self->array[src].adjList;
-
-    while (tmp != NULL) {
+    
+    while (tmp != NULL) {    
         tmp = tmp->nextNeighbour;
     }
 
     tmp->nextNeighbour = node;
     tmp->nextNeighbour->weight = weight;
+    
+    node->previousNeighbour = tmp;
 }
 
+
+
 void graph_remove_edge(struct Graph *self, int src, int dest) {
+
     if (src < 1 || src > self->nbMaxNodes) {
-        printf("Source invalid");
+        printf("Source invalid !\n");
         return;
     }
+
     if (dest < 1 || dest > self->nbMaxNodes) {
-        printf("Source invalid");
+        printf("Destination invalid !\n");
         return;
     }
+
+    browseDelete(self,src,dest);
+
+    if(!self->isDirected) {
+        browseDelete(self,dest,src);
+    }
+
 }
 
 void graph_print(struct Graph *self) {
@@ -93,8 +93,7 @@ void graph_print(struct Graph *self) {
     printf("n\n");
     printf("node: neighbours\n");
 
-    int i, j;
-    for (i = 0; i < self->size; i++) {
+    for (int i = 0; i < self->size; i++) {
         printf ("%d: ", i);
         struct Neighbour *curr = self->array[i].adjList;
         while (curr) {
@@ -109,5 +108,25 @@ void graph_print(struct Graph *self) {
         printf("\n");
     }
 
+}
 
+void browseDelete(struct Graph *self, int src, int dest){
+    int index = 0;
+    struct Neighbour *n =  self->array[src].adjList;
+
+    while(n->nextNeighbour != NULL){
+        if(n->neighbour == dest){
+           if (index == 0) {
+                self->array[src].adjList = n->nextNeighbour;
+           } 
+           else {
+                n->previousNeighbour->nextNeighbour = n->nextNeighbour; 
+           }
+           free(n);
+           break;
+        }
+        /* increment */
+        n = n->nextNeighbour;
+        index++;
+    } 
 }

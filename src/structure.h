@@ -11,7 +11,6 @@ struct Neighbour {
 
     struct Neighbour *nextNeighbour;
     struct Neighbour *previousNeighbour;
-
 };
 
 typedef struct Node Node;
@@ -27,9 +26,6 @@ struct Graph {
 
     struct Node *array;
 };
-
-
-
 
 
 #endif //GRAF_STRUCTURE_H
