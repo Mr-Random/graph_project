@@ -24,9 +24,19 @@ int main() {
     graph_add_node(myGraph);
     graph_add_node(myGraph);
     graph_add_node(myGraph);
+    graph_add_node(myGraph);
+    graph_add_node(myGraph);
 
-    graph_add_edge(myGraph, 0, 16, 30);
 
+    graph_add_edge(myGraph, 0, 1, 30);
+    graph_add_edge(myGraph, 0, 2, 30);
+
+    graph_remove_edge(myGraph, 0, 1);
+
+    graph_add_edge(myGraph, 0, 3, 30);
+    graph_add_edge(myGraph, 0, 4, 30);
+
+    graph_remove_edge(myGraph, 0, 3);
     graph_print(myGraph);
     //graph_load("F:\\Users\\Corentin\\Downloads\\file.txt");
 

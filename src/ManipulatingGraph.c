@@ -53,7 +53,7 @@ void graph_add_edge(struct Graph *self, int src, int dest, int weight){
 
     struct Neighbour *tmp  = self->array[src].adjList;
     
-    while (tmp != NULL) {    
+    while (tmp->nextNeighbour != NULL) {
         tmp = tmp->nextNeighbour;
     }
 
@@ -67,21 +67,25 @@ void graph_add_edge(struct Graph *self, int src, int dest, int weight){
 
 void graph_remove_edge(struct Graph *self, int src, int dest) {
 
-    if (src < 1 || src > self->nbMaxNodes) {
+    if (src < 0 || src > self->nbMaxNodes) {
         printf("Source invalid !\n");
         return;
     }
 
-    if (dest < 1 || dest > self->nbMaxNodes) {
+    if (dest < 0 || dest > self->nbMaxNodes) {
         printf("Destination invalid !\n");
         return;
     }
 
-    browseDelete(self,src,dest);
+    browseDelete(self, src, dest);
 
     if(!self->isDirected) {
-        browseDelete(self,dest,src);
+        browseDelete(self, dest, src);
     }
+
+}
+
+void graph_remove_node(struct Graph *self, int node) {
 
 }
 
@@ -114,10 +118,13 @@ void browseDelete(struct Graph *self, int src, int dest){
     int index = 0;
     struct Neighbour *n =  self->array[src].adjList;
 
-    while(n->nextNeighbour != NULL){
+    while(n != NULL){
+
         if(n->neighbour == dest){
+
            if (index == 0) {
                 self->array[src].adjList = n->nextNeighbour;
+                printf("index : %d\n\n\n", index);
            } 
            else {
                 n->previousNeighbour->nextNeighbour = n->nextNeighbour; 
