@@ -21,22 +21,28 @@ int main() {
     struct Graph *myGraph = malloc(sizeof(struct Graph));
     graph_create(myGraph, maxNode, directed);
 
-    graph_add_node(myGraph);
-    graph_add_node(myGraph);
-    graph_add_node(myGraph);
-    graph_add_node(myGraph);
-    graph_add_node(myGraph);
+    graph_add_node(myGraph, 7);
+    graph_add_node(myGraph, 5);
+    graph_add_node(myGraph, 3);
+    graph_add_node(myGraph, 1);
+    graph_add_node(myGraph, 6);
 
 
-    graph_add_edge(myGraph, 0, 1, 30);
-    graph_add_edge(myGraph, 0, 2, 30);
+    graph_add_edge(myGraph, 7, 5, 30);
+    graph_add_edge(myGraph, 7, 3, 30);
 
-    graph_remove_edge(myGraph, 0, 1);
+    graph_remove_edge(myGraph, 7, 5);
 
-    graph_add_edge(myGraph, 0, 3, 30);
-    graph_add_edge(myGraph, 0, 4, 30);
+    graph_add_edge(myGraph, 7, 6, 30);
+    graph_add_edge(myGraph, 6, 5, 30);
 
-    graph_remove_edge(myGraph, 0, 3);
+    graph_remove_edge(myGraph, 7, 6);
+
+    graph_add_edge(myGraph, 3, 5, 40);
+    graph_add_edge(myGraph, 5, 3, 40);
+
+    graph_remove_node(myGraph, 3);
+
     graph_print(myGraph);
     //graph_load("F:\\Users\\Corentin\\Downloads\\file.txt");
 

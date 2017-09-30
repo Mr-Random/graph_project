@@ -15,6 +15,7 @@ struct Neighbour {
 
 typedef struct Node Node;
 struct Node {
+    int node;
     struct Neighbour *adjList;
 };
 

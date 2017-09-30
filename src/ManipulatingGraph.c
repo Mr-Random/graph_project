@@ -10,7 +10,7 @@
 #include "ManipulatingGraph.h"
 #include "ManipulatingLinkedLists.h"
 
-void graph_add_node(struct Graph *self) {
+void graph_add_node(struct Graph *self, int node) {
 
     if (self->size == self->nbMaxNodes) {
         self->nbMaxNodes *= 2;
@@ -25,18 +25,21 @@ void graph_add_node(struct Graph *self) {
     }
 
     self->array[self->size].adjList = NULL;
+    self->array[self->size].node = node;
     self->size += 1;
 }
 
-
 void graph_add_edge(struct Graph *self, int src, int dest, int weight){
 
-    if (src < 0 || src > self->size) {
+    int indexSource = findNode(self, src);
+    int indexDestination = findNode(self, dest);
+
+    if (indexSource == -1) {
         printf("Source invalid !\n");
         return;
     }
 
-    if (dest < 0 || dest > self->size) {
+    if (indexDestination == -1) {
         printf("Destination invalid !\n");
         return;
     }
@@ -45,13 +48,13 @@ void graph_add_edge(struct Graph *self, int src, int dest, int weight){
     node->neighbour = dest;
     node->nextNeighbour = NULL;
 
-    if (self->array[src].adjList == NULL) {
-        self->array[src].adjList = node;
-        self->array[src].adjList->weight = weight;
+    if (self->array[indexSource].adjList == NULL) {
+        self->array[indexSource].adjList = node;
+        self->array[indexSource].adjList->weight = weight;
         return;
     }
 
-    struct Neighbour *tmp  = self->array[src].adjList;
+    struct Neighbour *tmp  = self->array[indexSource].adjList;
     
     while (tmp->nextNeighbour != NULL) {
         tmp = tmp->nextNeighbour;
@@ -63,30 +66,62 @@ void graph_add_edge(struct Graph *self, int src, int dest, int weight){
     node->previousNeighbour = tmp;
 }
 
-
-
 void graph_remove_edge(struct Graph *self, int src, int dest) {
 
-    if (src < 0 || src > self->nbMaxNodes) {
+    int indexSource = findNode(self, src);
+    int indexDestination = findNode(self, dest);
+
+    if (indexSource == -1) {
         printf("Source invalid !\n");
         return;
     }
 
-    if (dest < 0 || dest > self->nbMaxNodes) {
+    if (indexDestination == -1) {
         printf("Destination invalid !\n");
         return;
     }
 
-    browseDelete(self, src, dest);
+    browseDelete(self, indexSource, dest);
 
     if(!self->isDirected) {
-        browseDelete(self, dest, src);
+        browseDelete(self, indexDestination, src);
     }
 
 }
 
 void graph_remove_node(struct Graph *self, int node) {
+    int indexNode = findNode(self, node);
 
+    if (indexNode == -1) {
+        printf("Node invalid !\n");
+        return;
+    }
+
+    //remove edges
+    int i;
+    for (i = 0; i < self->size; i++) {
+        browseDelete(self, i, node);
+    }
+
+    //remove node
+    if (self->array[indexNode].adjList != NULL) {
+
+        struct Neighbour* tmp;
+
+        while (self->array[indexNode].adjList != NULL)
+        {
+            tmp = self->array[indexNode].adjList;
+            self->array[indexNode].adjList = self->array[indexNode].adjList->nextNeighbour;
+            free(tmp);
+        }
+    }
+    free(self->array[indexNode].adjList);
+
+    //move back of all value from index of node in array to the end of array
+    for (size_t i = indexNode ; i < self->size-1 ; i++) {
+        self->array[i] = self->array[i + 1];
+    }
+    self->size--;
 }
 
 void graph_print(struct Graph *self) {
@@ -98,7 +133,7 @@ void graph_print(struct Graph *self) {
     printf("node: neighbours\n");
 
     for (int i = 0; i < self->size; i++) {
-        printf ("%d: ", i);
+        printf ("%d: ", self->array[i].node);
         struct Neighbour *curr = self->array[i].adjList;
         while (curr) {
             if (curr->nextNeighbour == NULL) {
@@ -114,6 +149,7 @@ void graph_print(struct Graph *self) {
 
 }
 
+
 void browseDelete(struct Graph *self, int src, int dest){
     int index = 0;
     struct Neighbour *n =  self->array[src].adjList;
@@ -124,8 +160,7 @@ void browseDelete(struct Graph *self, int src, int dest){
 
            if (index == 0) {
                 self->array[src].adjList = n->nextNeighbour;
-                printf("index : %d\n\n\n", index);
-           } 
+           }
            else {
                 n->previousNeighbour->nextNeighbour = n->nextNeighbour; 
            }
@@ -136,4 +171,14 @@ void browseDelete(struct Graph *self, int src, int dest){
         n = n->nextNeighbour;
         index++;
     } 
+}
+
+int findNode(struct Graph *self, int node) {
+    int i;
+    for (i = 0; i < self->size; i++) {
+        if (self->array[i].node == node) {
+            return i;
+        }
+    }
+    return -1;
 }
