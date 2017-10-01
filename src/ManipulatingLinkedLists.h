@@ -9,7 +9,6 @@
 
 void graph_create (struct Graph *self, int maxNode, bool directed);
 void graph_destroy (struct Graph *self);
-void graph_load (char file[]);
 
 
 

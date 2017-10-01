@@ -41,27 +41,5 @@ void graph_destroy (struct Graph *self) {
     free(self->array);
 }
 
-/* Function : Load a GRAF from a txt file */
-void graph_load (char file[]) {
-    FILE * fp;
-    char * line = NULL;
-    size_t len = 0;
-    ssize_t read;
 
-    fp = fopen(file, "r");
-    if (fp == NULL){
-        exit(EXIT_FAILURE);
-        //stderr("Error !");
-    }
-
-    while ((read = getline(&line, &len, fp)) != -1) {
-        printf("Retrieved line of length %zu :\n", read);
-        printf("%s", line);
-    }
-
-    fclose(fp);
-    if (line) 
-        free(line);
-    exit(EXIT_SUCCESS);
-}
 
