@@ -72,11 +72,14 @@ void createEdgesFromLoad(struct Graph *self, char *filename) {
         exit(EXIT_FAILURE);
         //stderr("Error !");
     }
-
+    int i = 0;
     while ((read = getline(&line, &len, fp)) != -1) {
+        if (i > 4) {
+            printf("2 - %s", line);
+        }
 
 
-        printf("1 %s", line);
+        i++;
     }
 
     fclose(fp);
@@ -85,7 +88,7 @@ void createEdgesFromLoad(struct Graph *self, char *filename) {
 }
 
 
-void createGraphFromLoad(struct Graph *self, char *filename) {
+int createGraphFromLoad(struct Graph *self, char *filename) {
     FILE *fp;
     char *line = NULL;
     size_t len = 0;
@@ -108,7 +111,7 @@ void createGraphFromLoad(struct Graph *self, char *filename) {
         if (i == 1) {
             maxNode = atoi(line);
         }
-        if (i == 3) {
+        else if(i == 3) {
             if (strcmp("y\n", line) == 0) {
                 directed = true;
             } else {
@@ -116,21 +119,26 @@ void createGraphFromLoad(struct Graph *self, char *filename) {
             }
             graph_create(self, maxNode, directed);
         }
-        printf("2 %s", line);
+        printf("1 - %s", line);
 
-
+        if (i < 5) {
+            inOrderToGoBack += read + 1;
+        }
         i++;
     }
 
     fclose(fp);
     if (line)
         free(line);
+
+    return inOrderToGoBack;
 }
 
 /* Function : Load a GRAF from a txt file */
 void graph_load (char file[], struct Graph *self) {
 
     createGraphFromLoad(self, file);
+    printf("\n");
     createEdgesFromLoad(self, file);
 
 }
