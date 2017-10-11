@@ -62,8 +62,8 @@ int main() {
     graph_print(myGraph);
 
     /* Save Graf in a file */ 
-    save_graph(myGraph);    
-
+    //save_graph(myGraph);    
+    graph_destroy(myGraph);
     free(myGraph);
 }
 
@@ -171,7 +171,7 @@ int getNode(struct Graph *self, char* line, bool addIsActive){
     /* Add Node */
     if(addIsActive)
         graph_add_node(self,node); 
-    
+
     return node;
 }
 
@@ -231,4 +231,5 @@ void getEdge(struct Graph *self,char* line){
         }
         i++;
     }
+
 }
