@@ -98,8 +98,7 @@ void graph_remove_node(struct Graph *self, int node) {
     }
 
     //remove edges
-    int i;
-    for (i = 0; i < self->size; i++) {
+    for (int i = 0; i < self->size; i++) {
         browseDelete(self, i, node);
     }
 
@@ -124,8 +123,48 @@ void graph_remove_node(struct Graph *self, int node) {
     self->size--;
 }
 
-void graph_print(struct Graph *self) {
+void save_graph(struct Graph *self) {
 
+    FILE* file;
+
+    file = fopen("../saveGraph.txt","w");
+
+    if(!file)
+        perror("fopen");
+
+    if(file != NULL){
+        
+        fprintf(file,"# maximum number of nodes\n");
+        fprintf(file,"%d\n", self->nbMaxNodes);
+        fprintf(file,"# directed\n");
+        fprintf(file,"n\n");
+        fprintf(file,"# node: neighbours\n");
+
+        for (int i = 0; i < self->size; i++) {
+            fprintf (file,"%d:", self->array[i].node);
+            struct Neighbour *curr = self->array[i].adjList;
+            while (curr) {
+                if (curr->nextNeighbour == NULL) {
+                    fprintf(file," (%d/%d)", curr->neighbour, curr->weight);
+                }
+                else {
+                    fprintf(file," (%d/%d),", curr->neighbour, curr->weight);
+                }
+                curr = curr->nextNeighbour;
+            }
+            fprintf(file,"\n");
+        }
+
+        fclose(file);
+
+    }else{
+        printf("Error : Impossible to open the file\n");
+    }
+
+}
+
+void graph_print(struct Graph *self) {
+    
     printf("# maximum number of nodes\n");
     printf("%d\n", self->nbMaxNodes);
     printf("# directed\n");
@@ -146,7 +185,7 @@ void graph_print(struct Graph *self) {
         }
         printf("\n");
     }
-
+    
 }
 
 

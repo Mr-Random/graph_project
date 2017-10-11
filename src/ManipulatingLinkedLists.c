@@ -1,13 +1,11 @@
-//
-// Created by Corentin on 24/09/2017.
-//
+//---------------------//
+// Linked-List Library //
+//---------------------//
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-
-
 #include "ManipulatingLinkedLists.h"
 
 
@@ -19,7 +17,6 @@ void graph_create(struct Graph *self, int maxNode, bool directed) {
 
     self->array = malloc(maxNode*sizeof(struct Node));
 }
-
 
 /* Function Destroy Graf and Free memory */
 void graph_destroy (struct Graph *self) {

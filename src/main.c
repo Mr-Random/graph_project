@@ -15,20 +15,20 @@
 */
 
 void graph_load (char file[], struct Graph *self);
+int getNode(struct Graph *self, char* line, bool addIsActive);
 
 int main() {
 
-    int maxNode = 10;
-    bool directed = false;
-
-
-
+    //int maxNode = 10;
+    //bool directed = false;
 
     struct Graph *myGraph = malloc(sizeof(struct Graph));
 
+    graph_load("../file.txt", myGraph);
 
-    graph_load("F:\\Users\\Corentin\\Downloads\\file.txt", myGraph);
+    char test = '1';
 
+    printf("test char %d",test);
     /*graph_create(myGraph, maxNode, directed);
     graph_add_node(myGraph, 7);
     graph_add_node(myGraph, 5);
@@ -56,6 +56,14 @@ int main() {
 
 
     //graph_destroy(myGraph);
+    
+
+    printf("\n--------------------\n");
+    graph_print(myGraph);
+
+    /* Save Graf in a file */ 
+    save_graph(myGraph);    
+
     free(myGraph);
 }
 
@@ -65,8 +73,6 @@ void createEdgesFromLoad(struct Graph *self, char *filename) {
     size_t len = 0;
     ssize_t read;
 
-    bool firstTime = true;
-
     fp = fopen(filename, "r");
     if (fp == NULL) {
         exit(EXIT_FAILURE);
@@ -75,14 +81,13 @@ void createEdgesFromLoad(struct Graph *self, char *filename) {
     int i = 0;
     while ((read = getline(&line, &len, fp)) != -1) {
         if (i > 4) {
-            printf("2 - %s", line);
+            //printf("2 - %s", line);
+            getEdge(self,line);
         }
-
-
         i++;
     }
 
-    fclose(fp);
+    fclose(fp);        
     if (line)
         free(line);
 }
@@ -98,7 +103,6 @@ int createGraphFromLoad(struct Graph *self, char *filename) {
     bool directed = false;
 
     int inOrderToGoBack;
-    bool firstTime = true;
 
     fp = fopen(filename, "r");
     if (fp == NULL) {
@@ -108,6 +112,7 @@ int createGraphFromLoad(struct Graph *self, char *filename) {
 
     int i = 0;
     while ((read = getline(&line, &len, fp)) != -1) {
+        
         if (i == 1) {
             maxNode = atoi(line);
         }
@@ -119,8 +124,12 @@ int createGraphFromLoad(struct Graph *self, char *filename) {
             }
             graph_create(self, maxNode, directed);
         }
-        printf("1 - %s", line);
-
+        
+        if(i > 4){
+            getNode(self,line,true);
+            printf("\n");
+        }
+        
         if (i < 5) {
             inOrderToGoBack += read + 1;
         }
@@ -140,5 +149,86 @@ void graph_load (char file[], struct Graph *self) {
     createGraphFromLoad(self, file);
     printf("\n");
     createEdgesFromLoad(self, file);
+    printf("\n");
+}
 
+int getNode(struct Graph *self, char* line, bool addIsActive){
+
+    char bufNode[10];
+    int i = 0;
+    
+    memset(bufNode,0, sizeof bufNode);//< test de clean mem
+
+    while(line[i] != ':'){
+        //printf("line[%d] = %c\n",i,line[i]);
+        i++;
+    } 
+    strncpy(bufNode,line,i);
+    
+    int node = atoi(bufNode);
+    printf("Node = %d\n",node);
+
+    /* Add Node */
+    if(addIsActive)
+        graph_add_node(self,node); 
+    
+    return node;
+}
+
+void getEdge(struct Graph *self,char* line){
+
+    /* Set char* buffer */
+    char bufNeighb[10];
+    char bufWeight[10];
+
+    //memset(bufWeight,0, sizeof bufWeight);
+
+    /* Init var */
+    int size = 0;
+    int i = 0;
+    int neighbour = 0;
+    int weight = 0;
+    
+    int currentNode = getNode(self,line,false);
+
+    while(line[i] != '\0'){
+        if(line[i] == '('){
+            
+            /* Clear Buffer */
+            memset(bufNeighb,0, sizeof bufNeighb);
+            memset(bufWeight,0, sizeof bufWeight);
+
+            /* Reset size */
+            size = 0;
+            i++;//< inc 1 for get the first number of the neighbour
+
+            while(line[i] != '/'){
+                bufNeighb[size] = line[i];
+                size++;
+                i++;
+            }
+            neighbour = atoi(bufNeighb);
+            printf("Neighbour = %d\n",neighbour);
+
+            /* Reset size */
+            size = 0;
+            i++;//< inc 1 for get the first number of the weight
+
+            while(line[i] != ')'){
+                bufWeight[size] = line[i];
+                size++;
+                i++;
+            }
+            weight = atoi(bufWeight);
+            printf("Weight = %d\n",weight);
+            
+            /* Add new Edge */
+            graph_add_edge(self,currentNode,neighbour,weight);
+
+            
+
+            printf("\n");
+        }
+        i++;
+    }
 }
