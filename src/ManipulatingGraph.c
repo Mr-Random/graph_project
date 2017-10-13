@@ -1,7 +1,3 @@
-//
-// Created by Corentin on 26/09/2017.
-//
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -158,8 +154,9 @@ void save_graph(struct Graph *self) {
         fclose(file);
 
     }else{
-        printf("Error : Impossible to open the file\n");
-    }
+        fprintf(stderr,"Error : Impossible to open the file\n");
+        //return(-1);
+    } 
 
 }
 
@@ -248,7 +245,6 @@ void createEdgesFromLoad(struct Graph *self, char *filename) {
     int i = 0;
     while ((read = getline(&line, &len, fp)) != -1) {
         if (i > 4) {
-            //printf("2 - %s", line);
             getEdge(self,line);
         }
         i++;
@@ -274,7 +270,6 @@ int createGraphFromLoad(struct Graph *self, char *filename) {
     fp = fopen(filename, "r");
     if (fp == NULL) {
         exit(EXIT_FAILURE);
-        //stderr("Error !");
     }
 
     int i = 0;
