@@ -25,7 +25,7 @@ void graph_add_node(struct Graph *self, int node) {
     self->size += 1;
 }
 
-void graph_add_edge(struct Graph *self, int src, int dest, int weight){
+void graph_add_edge(struct Graph *self, int src, int dest, int weight, bool firstTime) {
 
     int indexSource = findNode(self, src);
     int indexDestination = findNode(self, dest);
@@ -38,6 +38,10 @@ void graph_add_edge(struct Graph *self, int src, int dest, int weight){
     if (indexDestination == -1) {
         printf("Destination invalid !\n");
         return;
+    }
+
+    if (self->isDirected == false && firstTime == true) {
+        graph_add_edge(self, dest, src, weight, false);
     }
 
     struct Neighbour *node = malloc(sizeof(struct Neighbour));
@@ -119,11 +123,11 @@ void graph_remove_node(struct Graph *self, int node) {
     self->size--;
 }
 
-void save_graph(struct Graph *self) {
+void save_graph(struct Graph *self, char fileString[]) {
 
     FILE* file;
 
-    file = fopen("../saveGraph.txt","w");
+    file = fopen(fileString,"w");
 
     if(!file)
         perror("fopen");
@@ -376,7 +380,7 @@ void getEdge(struct Graph *self,char* line){
             printf("Weight = %d\n",weight);
             
             /* Add new Edge */
-            graph_add_edge(self,currentNode,neighbour,weight);      
+            graph_add_edge(self,currentNode,neighbour,weight, false);
 
             printf("\n");
         }
