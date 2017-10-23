@@ -117,13 +117,16 @@ void graph_remove_node(struct Graph *self, int node) {
     free(self->array[indexNode].adjList);
 
     //move back of all value from index of node in array to the end of array
-    for (size_t i = indexNode ; i < self->size-1 ; i++) {
+    for (int i = indexNode ; i < self->size-1 ; i++) {
         self->array[i] = self->array[i + 1];
     }
     self->size--;
 }
 
-void save_graph(struct Graph *self, char fileString[]) {
+/* Function that save the  current Graph in a file using fprintf */
+/* it's the same function as print_graph but instead of 
+   displaying on the standard outup we write to a file */
+   void save_graph(struct Graph *self, char fileString[]) {
 
     FILE* file;
 
@@ -164,6 +167,7 @@ void save_graph(struct Graph *self, char fileString[]) {
 
 }
 
+/* Function that print the graph in stdin */
 void graph_print(struct Graph *self) {
     
     printf("# maximum number of nodes\n");
@@ -189,7 +193,9 @@ void graph_print(struct Graph *self) {
     
 }
 
-
+/* Function used to remove edges by browsing adjacent list */
+/* we go through the adjency list and see if one of the neighbors 
+   corresponds to the destination node of our edges to be deleted */
 void browseDelete(struct Graph *self, int src, int dest){
     int index = 0;
     struct Neighbour *n =  self->array[src].adjList;
@@ -207,7 +213,7 @@ void browseDelete(struct Graph *self, int src, int dest){
            free(n);
            break;
         }
-        /* increment */
+        /* Go to the next Neighbour */
         n = n->nextNeighbour;
         index++;
     } 
@@ -224,9 +230,10 @@ int findNode(struct Graph *self, int node) {
 }
 
 
-//------- GRAPH LOAD FUNCTION ---------//
+/* GRAPH LOAD FUNCTION */
+/* Function used to load a graph from a txt file */
 
-/* Function : Load a GRAF from a txt file */
+/* Main function that calls all the others */
 void graph_load (char file[], struct Graph *self) {
     
     createGraphFromLoad(self, file);
@@ -235,6 +242,7 @@ void graph_load (char file[], struct Graph *self) {
     printf("\n");
 }
 
+/* Function called first in graph_load to create the graph from the recovered nodes */ 
 void createEdgesFromLoad(struct Graph *self, char *filename) {
     FILE *fp;
     char *line = NULL;
@@ -244,11 +252,10 @@ void createEdgesFromLoad(struct Graph *self, char *filename) {
     fp = fopen(filename, "r");
     if (fp == NULL) {
         exit(EXIT_FAILURE);
-        //stderr("Error !");
     }
     int i = 0;
     while ((read = getline(&line, &len, fp)) != -1) {
-        if (i > 4) {
+        if (i > 4) {//< line greater than four are the ones that define the graph
             getEdge(self,line);
         }
         i++;
@@ -259,7 +266,7 @@ void createEdgesFromLoad(struct Graph *self, char *filename) {
         free(line);
 }
 
-
+/* Function called second in graph_load to create the graph from the recovered edges */
 int createGraphFromLoad(struct Graph *self, char *filename) {
     FILE *fp;
     char *line = NULL;
@@ -269,7 +276,7 @@ int createGraphFromLoad(struct Graph *self, char *filename) {
     int maxNode = 0;
     bool directed = false;
 
-    int inOrderToGoBack;
+    int inOrderToGoBack = -1;
 
     fp = fopen(filename, "r");
     if (fp == NULL) {
@@ -277,12 +284,13 @@ int createGraphFromLoad(struct Graph *self, char *filename) {
     }
 
     int i = 0;
+    /* Get each line from the file */
     while ((read = getline(&line, &len, fp)) != -1) {
         
-        if (i == 1) {
+        if (i == 1) {//< line 1 is the number of nodes
             maxNode = atoi(line);
         }
-        else if(i == 3) {
+        else if(i == 3) {//< line 3 is the graph type information (directed: y/n)
             if (strcmp("y\n", line) == 0) {
                 directed = true;
             } else {
@@ -291,7 +299,7 @@ int createGraphFromLoad(struct Graph *self, char *filename) {
             graph_create(self, maxNode, directed);
         }
         
-        if(i > 4){
+        if(i > 4){//< line greater than four are the ones that define the graph
             getNode(self,line,true);
             printf("\n");
         }
@@ -309,7 +317,9 @@ int createGraphFromLoad(struct Graph *self, char *filename) {
     return inOrderToGoBack;
 }
 
-/* Function */
+/* Function that retrieves nodes by reading file */
+/* We retrieve each line read from the file, then we read 
+   them until found ':'which means the end of the name of node */
 int getNode(struct Graph *self, char* line, bool addIsActive){
 
     char bufNode[10];
@@ -333,7 +343,10 @@ int getNode(struct Graph *self, char* line, bool addIsActive){
     return node;
 }
 
-/* Function */
+/* Function that retrieves edges by reading file */
+/* We retrieve each line read from the file, then we read them until 
+   found '(' which means the beginning of edge delcaration then we read 
+   the information between this parentheses that correspond to an edge */
 void getEdge(struct Graph *self,char* line){
 
     /* Set char* buffer */
