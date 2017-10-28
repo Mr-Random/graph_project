@@ -18,8 +18,8 @@
 int main() {
 
     struct Graph *myGraph = malloc(sizeof(struct Graph));
-
-    MainMenu(myGraph);
+    
+    MainMenu(&myGraph);
 
     free(myGraph);
 }

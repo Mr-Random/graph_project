@@ -7,14 +7,15 @@
 
 #include "structure.h"
 
+void graph_create (struct Graph *self, int maxNode, bool directed);
+void graph_destroy (struct Graph *self);
+
 void graph_add_node(struct Graph *self, int node);
-void graph_add_edge(struct Graph *self, int src, int dest, int weight, bool firstTime);
-void graph_remove_edge(struct Graph *self, int src, int dest);
+
 void graph_remove_node(struct Graph *self, int node);
 void graph_print(struct Graph *self);
 void save_graph(struct Graph *self, char fileString[]);
 
-void browseDelete(struct Graph *self, int src, int dest);
 int findNode(struct Graph *self, int node);
 
 //----- GRAPH LOAD FUNCTION ------//

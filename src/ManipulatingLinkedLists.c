@@ -6,37 +6,96 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+
+#include "ManipulatingGraph.h"
 #include "ManipulatingLinkedLists.h"
 
-
-/* Function Create and Init Graf */
-void graph_create(struct Graph *self, int maxNode, bool directed) {
-    self->size = 0;
-    self->nbMaxNodes = maxNode;
-    self->isDirected = directed;
-
-    self->array = malloc(maxNode*sizeof(struct Node));
-}
-
-/* Function Destroy Graf and Free memory */
-void graph_destroy (struct Graph *self) {
+void graph_add_edge(struct Graph *self, int src, int dest, int weight, bool firstTime) {
     
-    for (int i = 0; i < self->size; i++) {
-        if (self->array[i].adjList != NULL) {
-
-            struct Neighbour* tmp;
-
-            while (self->array[i].adjList != NULL)
-            {
-                tmp = self->array[i].adjList;
-                self->array[i].adjList = self->array[i].adjList->nextNeighbour;
-                free(tmp);
-            }
+        int indexSource = findNode(self, src);
+        int indexDestination = findNode(self, dest);
+    
+        if (indexSource == -1) {
+            printf("Source invalid !\n");
+            return;
         }
-        free(self->array[i].adjList);
+    
+        if (indexDestination == -1) {
+            printf("Destination invalid !\n");
+            return;
+        }
+    
+        if (self->isDirected == false && firstTime == true) {
+            graph_add_edge(self, dest, src, weight, false);
+        }
+    
+        struct Neighbour *node = malloc(sizeof(struct Neighbour));
+        node->neighbour = dest;
+        node->nextNeighbour = NULL;
+    
+        if (self->array[indexSource].adjList == NULL) {
+            self->array[indexSource].adjList = node;
+            self->array[indexSource].adjList->weight = weight;
+            return;
+        }
+    
+        struct Neighbour *tmp  = self->array[indexSource].adjList;
+        
+        while (tmp->nextNeighbour != NULL) {
+            tmp = tmp->nextNeighbour;
+        }
+    
+        tmp->nextNeighbour = node;
+        tmp->nextNeighbour->weight = weight;
+        
+        node->previousNeighbour = tmp;
     }
-    free(self->array);
+    
+    void graph_remove_edge(struct Graph *self, int src, int dest) {
+    
+        int indexSource = findNode(self, src);
+        int indexDestination = findNode(self, dest);
+    
+        if (indexSource == -1) {
+            printf("Source invalid !\n");
+            return;
+        }
+    
+        if (indexDestination == -1) {
+            printf("Destination invalid !\n");
+            return;
+        }
+    
+        browseDelete(self, indexSource, dest);
+    
+        if(!self->isDirected) {
+            browseDelete(self, indexDestination, src);
+        }
+    
+    }
+
+/* Function used to remove edges by browsing adjacent list */
+/* we go through the adjency list and see if one of the neighbors 
+   corresponds to the destination node of our edges to be deleted */
+void browseDelete(struct Graph *self, int src, int dest){
+    int index = 0;
+    struct Neighbour *n =  self->array[src].adjList;
+
+    while(n != NULL){
+
+        if(n->neighbour == dest){
+
+           if (index == 0) {
+                self->array[src].adjList = n->nextNeighbour;
+           }
+           else {
+                n->previousNeighbour->nextNeighbour = n->nextNeighbour; 
+           }
+           free(n);
+           break;
+        }
+        /* Go to the next Neighbour */
+        n = n->nextNeighbour;
+        index++;
+    } 
 }
-
-
-
