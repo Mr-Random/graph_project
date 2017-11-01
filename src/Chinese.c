@@ -5,7 +5,52 @@
 #include <stdio.h>
 #include <mem.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "structure.h"
+#include "ManipulatingGraph.h"
+
+
+int ConvertToMatrix(struct Graph *self, int myMatrix[self->size][self->size]) {
+    for (int i = 0; i < self->size; i++) {
+        struct Neighbour *curr = self->array[i].adjList;
+        while (curr) {
+            myMatrix[i][findNode(self, curr->neighbour)] = curr->weight;
+            curr = curr->nextNeighbour;
+        }
+    }
+}
+
+void FloydWarshall(struct Graph *self, int myMatrix[self->size][self->size], int distance[self->size][self->size]) {
+
+    for(int i = 0; i < self->size; i++) {
+        for(int j = 0; j < self->size; j++) {
+            if (i == j) {
+                distance[i][j] = 0;
+            }
+            else if (myMatrix[i][j] == 0) {
+                distance[i][j] = INT_MAX;
+            }
+            else {
+                distance[i][j] = myMatrix[i][j];
+            }
+        }
+    }
+
+
+    for (int i = 0; i < self->size; i++) {
+        for (int j = 0; j < self->size; j++) {
+            for (int k = 0; k < self->size; k++) {
+                const int djk = distance[j][k];
+                const int dji = distance[j][i];
+                const int dik = distance[i][k];
+                if (dji != INT_MAX && dik != INT_MAX && djk > dji + dik) {
+                    distance[j][k] = dji + dik;
+                }
+            }
+        }
+    }
+
+}
 
 void solveChineseProblem(struct Graph *self) {
 
@@ -13,6 +58,7 @@ void solveChineseProblem(struct Graph *self) {
     int tabDegree[self->size];
     memset( tabDegree, 0, self->size*sizeof(int) );
 
+    //KNOW THE DEGREE
     for (int i = 0; i < self->size; i++) {
         struct Neighbour *curr = self->array[i].adjList;
         while (curr) {
@@ -21,6 +67,7 @@ void solveChineseProblem(struct Graph *self) {
         }
     }
 
+    //PRINT
     for (int i = 0; i < self->size; i++) {
         printf("[%d] = %d\n", i, tabDegree[i]);
         if (tabDegree[i] % 2 != 0) {
@@ -28,7 +75,27 @@ void solveChineseProblem(struct Graph *self) {
         }
     }
 
-    printf("\n\nNumber odd degree : %d", numberOddDegree);
+    printf("\n\nNumber odd degree : %d\n", numberOddDegree);
+
+
+
+    //MATRIX
+    int myMatrix[self->size][self->size];
+    memset(myMatrix, 0, self->size*self->size*sizeof(int) );
+
+    for(int i = 0; i < self->size; i++) {
+        for(int j = 0; j < self->size; j++) {
+            myMatrix[i][j];
+        }
+    }
+    ConvertToMatrix(self, myMatrix);
+
+
+    int distance[self->size][self->size];
+    memset(distance, 0, self->size*self->size*sizeof(int) );
+
+    FloydWarshall(self, myMatrix, distance);
+
 
 
     //Eulerian
@@ -41,12 +108,17 @@ void solveChineseProblem(struct Graph *self) {
     }
     //Non-Eulerian
     else {
-        
+
     }
 
 
 
     free(tabDegree);
-
+    free(myMatrix);
+    free(distance);
 
 }
+
+
+
+
