@@ -25,18 +25,27 @@ int main() {
 
 
 
-    graph_create(myGraph, 12, true);
+    graph_create(myGraph, 12, false);
 
-    graph_add_node(myGraph, 0);
     graph_add_node(myGraph, 1);
     graph_add_node(myGraph, 2);
     graph_add_node(myGraph, 3);
+    graph_add_node(myGraph, 4);
+    graph_add_node(myGraph, 5);
+    graph_add_node(myGraph, 6);
+    graph_add_node(myGraph, 7);
 
-    graph_add_edge(myGraph, 0, 2, -2);
-    graph_add_edge(myGraph, 1, 2, 3);
-    graph_add_edge(myGraph, 1, 0, 4);
-    graph_add_edge(myGraph, 2, 3, 2);
-    graph_add_edge(myGraph, 3, 1, -1);
+
+    graph_add_edge(myGraph, 1, 2, 1);
+    graph_add_edge(myGraph, 1, 3, 2);
+    graph_add_edge(myGraph, 2, 3, 4);
+    graph_add_edge(myGraph, 2, 4, 12);
+    graph_add_edge(myGraph, 3, 4, 4);
+    graph_add_edge(myGraph, 4, 5, 2);
+    graph_add_edge(myGraph, 5, 6, 1);
+    graph_add_edge(myGraph, 6, 7, 1);
+    graph_add_edge(myGraph, 5, 7, 10);
+
 
 
     //graph_print(myGraph);

@@ -10,6 +10,8 @@
 #include "ManipulatingGraph.h"
 
 
+void ConstructPair(int myTabOdd[], int numberOfOdd);
+
 int ConvertToMatrix(struct Graph *self, int myMatrix[self->size][self->size]) {
     for (int i = 0; i < self->size; i++) {
         struct Neighbour *curr = self->array[i].adjList;
@@ -52,6 +54,8 @@ void FloydWarshall(struct Graph *self, int myMatrix[self->size][self->size], int
 
 }
 
+
+
 void solveChineseProblem(struct Graph *self) {
 
     int numberOddDegree = 0;
@@ -77,7 +81,24 @@ void solveChineseProblem(struct Graph *self) {
 
     printf("\n\nNumber odd degree : %d\n", numberOddDegree);
 
+    //CONSTRUCTION OF TAB THAT CONTAINS ALL THE ODD NODE
+    int myTabOdd[numberOddDegree];
+    memset(myTabOdd, 0, numberOddDegree*sizeof(int) );
 
+    int j = 0;
+    for (int i = 0; i < self->size; i++) {
+        printf("[%d] = %d\n", i, tabDegree[i]);
+        if (tabDegree[i] % 2 != 0) {
+            myTabOdd[j] = i;
+            j++;
+        }
+    }
+
+    for (int i = 0; i < numberOddDegree; i++) {
+        printf("%d ", myTabOdd[i]);
+    }
+
+    ConstructPair(myTabOdd, numberOddDegree);
 
     //MATRIX
     int myMatrix[self->size][self->size];
@@ -116,6 +137,18 @@ void solveChineseProblem(struct Graph *self) {
     free(tabDegree);
     free(myMatrix);
     free(distance);
+
+}
+
+
+void ConstructPair(int myTabOdd[], int numberOfOdd) {
+    printf("\n\n");
+    for(int i = 0; i < numberOfOdd; i++) {
+        for(int j = i+1; j < numberOfOdd; j++) {
+            printf("%d, %d\n", myTabOdd[i], myTabOdd[j]);
+        }
+        printf("\n");
+    }
 
 }
 
