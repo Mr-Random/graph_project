@@ -75,6 +75,9 @@ void FloydWarshall(struct Graph *self, int myMatrix[self->size][self->size], int
 
 }
 
+int BestDistanceBetweenTwo(struct Graph *self, int distance[self->size][self->size], int source, int dest) {
+    return distance[source][dest];
+}
 
 void ConstructPair(int myTabOdd[], int numberOfOdd, int numberOfPossiblePair, int myTabPair[numberOfPossiblePair][2]) {
     int k = 0;
@@ -146,12 +149,114 @@ void ConstructAllPairing(int numberOfPossiblePair, int myTabPair[numberOfPossibl
     }
 }
 
+int GetIndexMinimumPairing (struct Graph *self, int distance[self->size][self->size],
+                       int numberOfPossiblePairings, int numberOddDegreeDividedByTwo, int myTabPairing[numberOfPossiblePairings][numberOddDegreeDividedByTwo][2] ) {
+
+    int result = 0;
+    int minimumPath = INT_MAX;
+
+    for (int i = 0; i < numberOfPossiblePairings; i++) {
+        int somme = 0;
+
+        for (int j = 0; j < numberOddDegreeDividedByTwo; j++) {
+            somme += distance[myTabPairing[i][j][0]][myTabPairing[i][j][1]];
+        }
+        if (somme < minimumPath) {
+            minimumPath = somme;
+            result = i;
+        }
+    }
+
+    return result;
+}
+
+
 long factorial(int n) {
     if (n == 0)
         return 1;
     else
         return(n * factorial(n-1));
 }
+
+
+int* printAllPathsUtil(int u, int d, bool visited[],
+                       int path[], int path_index, struct Graph *self, int myMatrix[self->size][self->size], int valueMinimumPairing, int *sizeOfBestPath) {
+
+    // Mark the current node and store it in path[]
+    visited[u] = true;
+    path[path_index] = u;
+    path_index++;
+
+    int myBestPath[path_index];
+    memset(myBestPath, 0, path_index*sizeof(int) );
+
+    // If current vertex is same as destination, then print
+    // current path[]
+    if (u == d)
+    {
+        int sommePath = 0;
+        for (int i = 0; i < path_index; i++) {
+            printf("%d ", path[i]);
+
+            if (i != path_index - 1) {
+                sommePath += myMatrix[path[i]][path[i + 1]];
+            }
+        }
+        if (sommePath == valueMinimumPairing) {
+            *sizeOfBestPath = path_index;
+            for (int i = 0; i < path_index; i++) {
+                myBestPath[i] = path[i];
+            }
+        }
+        printf("\t %d \n", sommePath);
+    }
+    else // If current vertex is not destination
+    {
+        // Recur for all the vertices adjacent to current vertex
+        struct Neighbour *n =  self->array[u].adjList;
+
+        while(n != NULL) {
+            int i = findNode(self, n->neighbour);
+            if (!visited[i]) {
+                printAllPathsUtil(i, d, visited, path, path_index, self, myMatrix, valueMinimumPairing, &sizeOfBestPath);
+            }
+            n = n->nextNeighbour;
+        }
+
+    }
+
+    // Remove current vertex from path[] and mark it as unvisited
+    path_index--;
+    visited[u] = false;
+
+    return myBestPath;
+
+}
+
+
+
+int* printAllPaths(struct Graph *self, int s, int d, int myMatrix[self->size][self->size], int valueMinimumPairing, int *sizeOfBestPath) {
+    bool visited[self->size];
+
+    // Create an array to store paths
+    int path[self->size];
+    int path_index = 0; // Initialize path[] as empty
+
+    // Initialize all vertices as not visited
+    for (int i = 0; i < self->size; i++)
+        visited[i] = false;
+
+    // Call the recursive helper function to print all paths
+    int* result;
+    int pointeurOfBestPath = 0;
+    result = printAllPathsUtil(s, d, visited, path, path_index, self, myMatrix, valueMinimumPairing, &pointeurOfBestPath);
+    *sizeOfBestPath = 42;
+    printf("ouiiiiiiiiiiiii %d", pointeurOfBestPath);
+    return result;
+}
+
+
+
 
 void solveChineseProblem(struct Graph *self) {
 
@@ -189,10 +294,6 @@ void solveChineseProblem(struct Graph *self) {
     //CONSTRUCT PAIR
     ConstructPair(myTabOdd, numberOddDegree, numberOfPossiblePair, myTabPair);
 
-    //PRINT
-    for (int i = 0; i < numberOfPossiblePair; i++) {
-        printf("%d, %d\n", myTabPair[i][0], myTabPair[i][1]);
-    }
 
     //ALL PAIRING POSSIBLE FOR GRAPH
     int numberOfPossiblePairings = factorial(numberOddDegree)/(pow(2, numberOddDegree/2) * (numberOddDegree / 2));
@@ -201,7 +302,9 @@ void solveChineseProblem(struct Graph *self) {
     int myTabPairing[numberOfPossiblePairings][numberOddDegree/2][2];
     memset(myTabPairing, 0, numberOfPossiblePairings*numberOddDegree/2*2*sizeof(int) );
 
+
     ConstructAllPairing(numberOfPossiblePair, myTabPair, numberOfPossiblePairings, numberOddDegree/2, myTabPairing);
+
 
 
     for (int i = 0; i < numberOfPossiblePairings; i++) {
@@ -209,23 +312,39 @@ void solveChineseProblem(struct Graph *self) {
         for (int j = 0; j < numberOddDegree/2; j++) {
             printf("(%d, %d)  ", myTabPairing[i][j][0], myTabPairing[i][j][1]);
         }
-        printf("]\n");
+        printf("]\n\n");
     }
 
 
 
 
-            //MATRIX
+    //MATRIX
     int myMatrix[self->size][self->size];
     memset(myMatrix, 0, self->size*self->size*sizeof(int) );
 
     ConvertToMatrix(self, myMatrix);
 
-
+    //GET MATRIX OF SHORTEST PATH
     int distance[self->size][self->size];
     memset(distance, 0, self->size*self->size*sizeof(int) );
 
     FloydWarshall(self, myMatrix, distance);
+
+
+    int indexMinimumPairing = GetIndexMinimumPairing(self, distance, numberOfPossiblePairings, numberOddDegree/2, myTabPairing);
+
+    for (int i = 0; i < numberOddDegree/2; i++) {
+        int valueMinimumPairing = distance[myTabPairing[indexMinimumPairing][i][0]][myTabPairing[indexMinimumPairing][i][1]];
+
+        printf("Value minimum pairing : %d \n", valueMinimumPairing);
+        int sizeOfBestPath = 0;
+        int * bestPath = printAllPaths(self, myTabPairing[indexMinimumPairing][0][0], myTabPairing[indexMinimumPairing][0][1], myMatrix, valueMinimumPairing, &sizeOfBestPath);
+
+
+        printf("Size of best path : %d\n\n\n\n", sizeOfBestPath);
+
+        break;
+    }
 
 
 
