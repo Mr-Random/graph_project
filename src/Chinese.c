@@ -9,6 +9,7 @@
 #include <math.h>
 #include "structure.h"
 #include "ManipulatingGraph.h"
+#include "ManipulatingLinkedLists.h"
 
 struct PathNode {
     int node;
@@ -19,6 +20,53 @@ struct Path {
     int numberOfNode;
     struct PathNode *adjList;
 };
+
+struct array {
+    int *data;
+    int capacity;
+    int size;
+};
+
+
+//Function for array
+
+void array_create(struct array *self) {
+    self->size = 0;
+    self->capacity = 100;
+
+    self->data = calloc(self->capacity, sizeof(int));
+}
+
+void array_destroy(struct array *self) {
+    free(self->data);
+}
+
+void array_add(struct array *self, int value) {
+    if (self->size == self->capacity) {
+        self->capacity *= 2;
+        int *data = calloc(self->capacity, sizeof(int));
+        memcpy(data, self->data, self->size * sizeof(int));
+        free(self->data);
+        self->data = data;
+    }
+    self->data[self->size] = value;
+    self->size += 1;
+
+}
+
+void array_insert(struct array *self, int value, int index) {
+    array_add(self, self->data[self->size]);
+    for (size_t i = self->size-1 ; i > index ; i--)
+        self->data[i] = self->data[i-1];
+
+    self->data[index] = value;
+}
+
+
+
+
+
+
 
 void path_destroy (struct Path *self) {
     if (self->adjList != NULL) {
@@ -287,6 +335,84 @@ void printAllPaths(struct Graph *self, int s, int d, int myMatrix[self->size][se
     printAllPathsUtil(s, d, visited, path, path_index, self, myMatrix, valueMinimumPairing, myPath);
 }
 
+
+
+void exploreTheNode(struct Graph *temp, int indexStart, int start, int i, struct array *myCircuit) {
+
+    int indexlastNodeSource;
+    int lastNodeSource;
+
+    int indexCurrentNode = indexStart;
+    int currentNode = start;
+    do {
+        if (indexStart != indexCurrentNode) {
+            array_insert(myCircuit, indexCurrentNode, i);
+        }
+        indexlastNodeSource = indexCurrentNode;
+        lastNodeSource = currentNode;
+
+        currentNode = temp->array[indexCurrentNode].adjList->neighbour;
+        indexCurrentNode = findNode(temp, currentNode);
+
+
+        browseDelete(temp, indexlastNodeSource, currentNode);
+        browseDelete(temp, indexCurrentNode, lastNodeSource);
+        i++;
+
+    } while (indexCurrentNode != indexStart);
+
+    array_insert(myCircuit, indexStart, i++);
+}
+
+void printEulerUtil(struct Graph *self, int start) {
+    struct Graph *temp = self;
+
+    struct array *myCircuit = malloc(sizeof(struct array));
+
+    array_create(myCircuit);
+    int indexSource = findNode(temp, start);
+    int source = start;
+
+    int indexlastNodeSource;
+    int lastNodeSource;
+
+    int indexCurrentNode = indexSource;
+    int currentNode = source;
+    do {
+        array_add(myCircuit, indexCurrentNode);
+
+        indexlastNodeSource = indexCurrentNode;
+        lastNodeSource = currentNode;
+
+        currentNode = temp->array[indexCurrentNode].adjList->neighbour;
+        indexCurrentNode = findNode(temp, currentNode);
+
+        browseDelete(temp, indexlastNodeSource, currentNode);
+        browseDelete(temp, indexCurrentNode, lastNodeSource);
+
+    } while (indexCurrentNode != indexSource);
+
+    array_add(myCircuit, indexSource);
+
+
+    for (int i = 0; i < myCircuit->size; i++) {
+        printf("%d / ", myCircuit->data[i]);
+        if (temp->array[myCircuit->data[i]].adjList != NULL) {
+            exploreTheNode(temp, myCircuit->data[i], temp->array[myCircuit->data[i]].node, i, myCircuit);
+            printf("\n%d, %d, %d\n", myCircuit->data[i], temp->array[myCircuit->data[i]].node, i);
+            i = -1;
+        }
+    }
+    printf("\n\n\n");
+    for (int i = 0; i < myCircuit->size; i++) {
+        printf("%d / ", myCircuit->data[i]);
+    }
+
+
+    //graph_print(self);
+
+    array_destroy(myCircuit);
+}
 
 
 

@@ -8,5 +8,6 @@
 #include "structure.h"
 
 void solveChineseProblem(struct Graph *self);
+void printEulerUtil(struct Graph *self, int start);
 
 #endif //GRAF_CHINESE_H
