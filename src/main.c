@@ -22,9 +22,6 @@ int main() {
 
 
 
-
-
-
     graph_create(myGraph, 12, false);
 
     /*graph_add_node(myGraph, 1);
@@ -47,6 +44,9 @@ int main() {
     graph_add_edge(myGraph, 5, 7, 10);*/
 
 
+
+
+    //EULERIAN GRAPH
     graph_add_node(myGraph, 1);
     graph_add_node(myGraph, 2);
     graph_add_node(myGraph, 3);
@@ -71,11 +71,10 @@ int main() {
     graph_add_edge(myGraph, 7, 8, 5);
 
 
-    printEulerUtil(myGraph, 1);
+    graph_print(myGraph);
 
-    //graph_print(myGraph);
+    solveChineseProblem(myGraph, 1);
 
-    //solveChineseProblem(myGraph);
     graph_destroy(myGraph);
 
     //MainMenu(&myGraph);

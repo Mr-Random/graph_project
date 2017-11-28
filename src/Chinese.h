@@ -7,7 +7,7 @@
 
 #include "structure.h"
 
-void solveChineseProblem(struct Graph *self);
+void solveChineseProblem(struct Graph *self, int start);
 void printEulerUtil(struct Graph *self, int start);
 
 #endif //GRAF_CHINESE_H

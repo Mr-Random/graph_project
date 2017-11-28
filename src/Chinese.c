@@ -3,7 +3,6 @@
 //
 
 #include <stdio.h>
-#include <mem.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <math.h>
@@ -409,14 +408,93 @@ void printEulerUtil(struct Graph *self, int start) {
     }
 
 
-    //graph_print(self);
 
     array_destroy(myCircuit);
 }
 
 
+void CaseNonEulerian (struct Graph *self, int tabDegree[self->size], int numberOddDegree) {
+        //CONSTRUCTION OF TAB THAT CONTAINS ALL THE ODD NODE
+        int myTabOdd[numberOddDegree];
+        memset(myTabOdd, 0, numberOddDegree*sizeof(int) );
+    
+        knowTabOdd(self, myTabOdd, tabDegree);
+    
+    
+        int numberOfPossiblePair = factorial(numberOddDegree)/(factorial(2)*(factorial(numberOddDegree - 2)));
+        printf("Number of possible pair : %d\n\n", numberOfPossiblePair);
+    
+        int myTabPair[numberOfPossiblePair][2];
+        memset(myTabPair, 0, numberOfPossiblePair*2*sizeof(int) );
+    
+        //CONSTRUCT PAIR
+        ConstructPair(myTabOdd, numberOddDegree, numberOfPossiblePair, myTabPair);
+    
+    
+        //ALL PAIRING POSSIBLE FOR GRAPH
+        int numberOfPossiblePairings = factorial(numberOddDegree)/(pow(2, numberOddDegree/2) * (numberOddDegree / 2));
+        printf("Number of possible pair : %d\n\n", numberOfPossiblePairings);
+    
+        int myTabPairing[numberOfPossiblePairings][numberOddDegree/2][2];
+        memset(myTabPairing, 0, numberOfPossiblePairings*numberOddDegree/2*2*sizeof(int) );
+    
+    
+        ConstructAllPairing(numberOfPossiblePair, myTabPair, numberOfPossiblePairings, numberOddDegree/2, myTabPairing);
+    
+    
+    
+        for (int i = 0; i < numberOfPossiblePairings; i++) {
+            printf("[");
+            for (int j = 0; j < numberOddDegree/2; j++) {
+                printf("(%d, %d)  ", myTabPairing[i][j][0], myTabPairing[i][j][1]);
+            }
+            printf("]\n\n");
+        }
+    
+    
+    
+    
+        //MATRIX
+        int myMatrix[self->size][self->size];
+        memset(myMatrix, 0, self->size*self->size*sizeof(int) );
+    
+        ConvertToMatrix(self, myMatrix);
+    
+        //GET MATRIX OF SHORTEST PATH
+        int distance[self->size][self->size];
+        memset(distance, 0, self->size*self->size*sizeof(int) );
+    
+        FloydWarshall(self, myMatrix, distance);
+    
+    
+        int indexMinimumPairing = GetIndexMinimumPairing(self, distance, numberOfPossiblePairings, numberOddDegree/2, myTabPairing);
+    
+        for (int i = 0; i < numberOddDegree/2; i++) {
+            struct Path *myPath = malloc(sizeof(struct Path));
+            int valueMinimumPairing = distance[myTabPairing[indexMinimumPairing][i][0]][myTabPairing[indexMinimumPairing][i][1]];
+    
+            printf("Value minimum pairing : %d \n", valueMinimumPairing);
+            printAllPaths(self, myTabPairing[indexMinimumPairing][i][0], myTabPairing[indexMinimumPairing][i][1], myMatrix, valueMinimumPairing, myPath);
+    
+            printf("Size of best path : %d\n\n\n\n", myPath->numberOfNode);
+    
+            struct PathNode *curr = myPath->adjList;
+            for (int j = 0; j < myPath->numberOfNode; j++) {
+    
+                    printf("(%d),", curr->node);
+    
+                curr = curr->nextNode;
+            }
+            printf("\n");
+    
+            path_destroy(myPath);
+            free(myPath);
+        }
+    
+    
+}
 
-void solveChineseProblem(struct Graph *self) {
+void solveChineseProblem(struct Graph *self, int start) {
 
     int numberOddDegree = 0;
 
@@ -426,98 +504,14 @@ void solveChineseProblem(struct Graph *self) {
     //KNOW THE DEGREE
     knowTheDegree(self, tabDegree);
 
-    //PRINT
-    for (int i = 0; i < self->size; i++) {
-        printf("[%d] = %d\n", i, tabDegree[i]);
-        if (tabDegree[i] % 2 != 0) {
-            numberOddDegree++;
-        }
-    }
 
     printf("\n\nNumber odd degree : %d\n", numberOddDegree);
-
-    //CONSTRUCTION OF TAB THAT CONTAINS ALL THE ODD NODE
-    int myTabOdd[numberOddDegree];
-    memset(myTabOdd, 0, numberOddDegree*sizeof(int) );
-
-    knowTabOdd(self, myTabOdd, tabDegree);
-
-
-    int numberOfPossiblePair = factorial(numberOddDegree)/(factorial(2)*(factorial(numberOddDegree - 2)));
-    printf("Number of possible pair : %d\n\n", numberOfPossiblePair);
-
-    int myTabPair[numberOfPossiblePair][2];
-    memset(myTabPair, 0, numberOfPossiblePair*2*sizeof(int) );
-
-    //CONSTRUCT PAIR
-    ConstructPair(myTabOdd, numberOddDegree, numberOfPossiblePair, myTabPair);
-
-
-    //ALL PAIRING POSSIBLE FOR GRAPH
-    int numberOfPossiblePairings = factorial(numberOddDegree)/(pow(2, numberOddDegree/2) * (numberOddDegree / 2));
-    printf("Number of possible pair : %d\n\n", numberOfPossiblePairings);
-
-    int myTabPairing[numberOfPossiblePairings][numberOddDegree/2][2];
-    memset(myTabPairing, 0, numberOfPossiblePairings*numberOddDegree/2*2*sizeof(int) );
-
-
-    ConstructAllPairing(numberOfPossiblePair, myTabPair, numberOfPossiblePairings, numberOddDegree/2, myTabPairing);
-
-
-
-    for (int i = 0; i < numberOfPossiblePairings; i++) {
-        printf("[");
-        for (int j = 0; j < numberOddDegree/2; j++) {
-            printf("(%d, %d)  ", myTabPairing[i][j][0], myTabPairing[i][j][1]);
-        }
-        printf("]\n\n");
-    }
-
-
-
-
-    //MATRIX
-    int myMatrix[self->size][self->size];
-    memset(myMatrix, 0, self->size*self->size*sizeof(int) );
-
-    ConvertToMatrix(self, myMatrix);
-
-    //GET MATRIX OF SHORTEST PATH
-    int distance[self->size][self->size];
-    memset(distance, 0, self->size*self->size*sizeof(int) );
-
-    FloydWarshall(self, myMatrix, distance);
-
-
-    int indexMinimumPairing = GetIndexMinimumPairing(self, distance, numberOfPossiblePairings, numberOddDegree/2, myTabPairing);
-
-    for (int i = 0; i < numberOddDegree/2; i++) {
-        struct Path *myPath = malloc(sizeof(struct Path));
-        int valueMinimumPairing = distance[myTabPairing[indexMinimumPairing][i][0]][myTabPairing[indexMinimumPairing][i][1]];
-
-        printf("Value minimum pairing : %d \n", valueMinimumPairing);
-        printAllPaths(self, myTabPairing[indexMinimumPairing][i][0], myTabPairing[indexMinimumPairing][i][1], myMatrix, valueMinimumPairing, myPath);
-
-        printf("Size of best path : %d\n\n\n\n", myPath->numberOfNode);
-
-        struct PathNode *curr = myPath->adjList;
-        for (int j = 0; j < myPath->numberOfNode; j++) {
-
-                printf("(%d),", curr->node);
-
-            curr = curr->nextNode;
-        }
-        printf("\n");
-
-        path_destroy(myPath);
-        free(myPath);
-}
 
 
 
     //Eulerian
     if (numberOddDegree == 0) {
-
+            printEulerUtil(self, start);
     }
     //Semi-Eulerian
     else if (numberOddDegree == 2) {
@@ -525,7 +519,7 @@ void solveChineseProblem(struct Graph *self) {
     }
     //Non-Eulerian
     else {
-
+        CaseNonEulerian(self, tabDegree, numberOddDegree);
     }
 
 
