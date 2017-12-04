@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <math.h>
+#include <mem.h>
 #include "structure.h"
 #include "ManipulatingGraph.h"
 #include "ManipulatingLinkedLists.h"
@@ -153,7 +154,6 @@ void ConstructPair(int myTabOdd[], int numberOfOdd, int numberOfPossiblePair, in
             myTabPair[k][1] = myTabOdd[j];
             k++;
         }
-        printf("\n");
     }
 
 }
@@ -279,7 +279,7 @@ void printAllPathsUtil(int u, int d, bool visited[],
     {
         int sommePath = 0;
         for (int i = 0; i < path_index; i++) {
-            printf("%d ", path[i]);
+
 
             if (i != path_index - 1) {
                 sommePath += myMatrix[path[i]][path[i + 1]];
@@ -395,10 +395,8 @@ void printEulerUtil(struct Graph *self, int start) {
 
 
     for (int i = 0; i < myCircuit->size; i++) {
-        printf("%d / ", myCircuit->data[i]);
         if (temp->array[myCircuit->data[i]].adjList != NULL) {
             exploreTheNode(temp, myCircuit->data[i], temp->array[myCircuit->data[i]].node, i, myCircuit);
-            printf("\n%d, %d, %d\n", myCircuit->data[i], temp->array[myCircuit->data[i]].node, i);
             i = -1;
         }
     }
@@ -413,7 +411,7 @@ void printEulerUtil(struct Graph *self, int start) {
 }
 
 
-void CaseNonEulerian (struct Graph *self, int tabDegree[self->size], int numberOddDegree) {
+void CaseNonEulerian (struct Graph *self, int tabDegree[self->size], int numberOddDegree, int start) {
         //CONSTRUCTION OF TAB THAT CONTAINS ALL THE ODD NODE
         int myTabOdd[numberOddDegree];
         memset(myTabOdd, 0, numberOddDegree*sizeof(int) );
@@ -422,8 +420,7 @@ void CaseNonEulerian (struct Graph *self, int tabDegree[self->size], int numberO
     
     
         int numberOfPossiblePair = factorial(numberOddDegree)/(factorial(2)*(factorial(numberOddDegree - 2)));
-        printf("Number of possible pair : %d\n\n", numberOfPossiblePair);
-    
+
         int myTabPair[numberOfPossiblePair][2];
         memset(myTabPair, 0, numberOfPossiblePair*2*sizeof(int) );
     
@@ -433,26 +430,14 @@ void CaseNonEulerian (struct Graph *self, int tabDegree[self->size], int numberO
     
         //ALL PAIRING POSSIBLE FOR GRAPH
         int numberOfPossiblePairings = factorial(numberOddDegree)/(pow(2, numberOddDegree/2) * (numberOddDegree / 2));
-        printf("Number of possible pair : %d\n\n", numberOfPossiblePairings);
-    
+
         int myTabPairing[numberOfPossiblePairings][numberOddDegree/2][2];
         memset(myTabPairing, 0, numberOfPossiblePairings*numberOddDegree/2*2*sizeof(int) );
     
     
         ConstructAllPairing(numberOfPossiblePair, myTabPair, numberOfPossiblePairings, numberOddDegree/2, myTabPairing);
     
-    
-    
-        for (int i = 0; i < numberOfPossiblePairings; i++) {
-            printf("[");
-            for (int j = 0; j < numberOddDegree/2; j++) {
-                printf("(%d, %d)  ", myTabPairing[i][j][0], myTabPairing[i][j][1]);
-            }
-            printf("]\n\n");
-        }
-    
-    
-    
+
     
         //MATRIX
         int myMatrix[self->size][self->size];
@@ -468,30 +453,30 @@ void CaseNonEulerian (struct Graph *self, int tabDegree[self->size], int numberO
     
     
         int indexMinimumPairing = GetIndexMinimumPairing(self, distance, numberOfPossiblePairings, numberOddDegree/2, myTabPairing);
-    
+
+        struct Graph *temp = self;
         for (int i = 0; i < numberOddDegree/2; i++) {
             struct Path *myPath = malloc(sizeof(struct Path));
             int valueMinimumPairing = distance[myTabPairing[indexMinimumPairing][i][0]][myTabPairing[indexMinimumPairing][i][1]];
     
-            printf("Value minimum pairing : %d \n", valueMinimumPairing);
             printAllPaths(self, myTabPairing[indexMinimumPairing][i][0], myTabPairing[indexMinimumPairing][i][1], myMatrix, valueMinimumPairing, myPath);
     
-            printf("Size of best path : %d\n\n\n\n", myPath->numberOfNode);
-    
+
             struct PathNode *curr = myPath->adjList;
             for (int j = 0; j < myPath->numberOfNode; j++) {
-    
-                    printf("(%d),", curr->node);
-    
+
+                if (j != myPath->numberOfNode - 1) {
+                    graph_add_edge(temp, self->array[curr->node].node, self->array[curr->nextNode->node].node, myMatrix[curr->node][curr->nextNode->node]);
+                }
+
                 curr = curr->nextNode;
             }
-            printf("\n");
-    
+
             path_destroy(myPath);
             free(myPath);
         }
-    
-    
+
+    printEulerUtil(temp, start);
 }
 
 void solveChineseProblem(struct Graph *self, int start) {
@@ -503,9 +488,12 @@ void solveChineseProblem(struct Graph *self, int start) {
 
     //KNOW THE DEGREE
     knowTheDegree(self, tabDegree);
+    for (int i = 0; i < self->size; i++) {
+        if (tabDegree[i] % 2 != 0) {
+            numberOddDegree++;
+        }
+    }
 
-
-    printf("\n\nNumber odd degree : %d\n", numberOddDegree);
 
 
 
@@ -513,13 +501,28 @@ void solveChineseProblem(struct Graph *self, int start) {
     if (numberOddDegree == 0) {
             printEulerUtil(self, start);
     }
-    //Semi-Eulerian
-    else if (numberOddDegree == 2) {
+    else  {
+        if (numberOddDegree == 2) {
 
-    }
-    //Non-Eulerian
-    else {
-        CaseNonEulerian(self, tabDegree, numberOddDegree);
+            int indexStart = findNode(self, start);
+            bool goodStart = false;
+            for (int i = 0; i < self->size; i++) {
+                if (tabDegree[i] % 2 != 0 && indexStart == i) {
+                    goodStart = true;
+                    break;
+                }
+            }
+
+            if (goodStart == true) {
+                printEulerUtil(self, start);
+            }
+            else {
+                CaseNonEulerian(self, tabDegree, numberOddDegree, start);
+            }
+        }
+        else {
+            CaseNonEulerian(self, tabDegree, numberOddDegree, start);
+        }
     }
 
 
