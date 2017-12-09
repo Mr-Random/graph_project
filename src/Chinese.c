@@ -475,7 +475,6 @@ void CaseNonEulerian (struct Graph *self, int tabDegree[self->size], int numberO
             path_destroy(myPath);
             free(myPath);
         }
-
     printEulerUtil(temp, start);
 }
 
@@ -504,21 +503,23 @@ void solveChineseProblem(struct Graph *self, int start) {
     else  {
         if (numberOddDegree == 2) {
 
-            int indexStart = findNode(self, start);
-            bool goodStart = false;
+            /*int indexStart = findNode(self, start);
+
+            bool oddDegreeStart = false;
             for (int i = 0; i < self->size; i++) {
                 if (tabDegree[i] % 2 != 0 && indexStart == i) {
-                    goodStart = true;
+
+                    oddDegreeStart = true;
                     break;
                 }
             }
 
-            if (goodStart == true) {
+            if (oddDegreeStart == false) {
                 printEulerUtil(self, start);
-            }
-            else {
+            }*/
+            //else {
                 CaseNonEulerian(self, tabDegree, numberOddDegree, start);
-            }
+            //}
         }
         else {
             CaseNonEulerian(self, tabDegree, numberOddDegree, start);
