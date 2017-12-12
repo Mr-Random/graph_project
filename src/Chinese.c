@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <math.h>
-#include <mem.h>
 #include "structure.h"
 #include "ManipulatingGraph.h"
 #include "ManipulatingLinkedLists.h"
