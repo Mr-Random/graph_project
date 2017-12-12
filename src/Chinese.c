@@ -78,8 +78,7 @@ void path_destroy (struct Path *self) {
             free(tmp);
         }
     }
-    free(self->adjList);
-
+    //free(self->adjList);
 }
 
 void knowTheDegree(struct Graph *self, int tabDegree[]) {
@@ -412,9 +411,26 @@ void CaseNonEulerian (struct Graph *self, int tabDegree[self->size], int numberO
         //CONSTRUCTION OF TAB THAT CONTAINS ALL THE ODD NODE
         int myTabOdd[numberOddDegree];
         memset(myTabOdd, 0, numberOddDegree*sizeof(int) );
-    
+
         knowTabOdd(self, myTabOdd, tabDegree);
-    
+
+        /* Heuristic */
+        if(numberOddDegree > 10){
+            int node1;
+            int node2;
+            int tmp = 1;
+            for(int i = 0; i<numberOddDegree; i++){
+                if(tmp == 1){
+                    node1 = myTabOdd[i];
+                    tmp++;
+                }else{
+                    node2 = myTabOdd[i];
+                    graph_add_edge(self,node1,node2,99);
+                    tmp = 1;
+                }
+            }
+            return;
+        }
     
         int numberOfPossiblePair = factorial(numberOddDegree)/(factorial(2)*(factorial(numberOddDegree - 2)));
 
@@ -541,7 +557,6 @@ void solveChineseProblem(struct Graph *self, int start) {
             numberOddDegree++;
         }
     }
-
 
 
 
