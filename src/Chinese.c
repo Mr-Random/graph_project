@@ -404,8 +404,6 @@ void printEulerUtil(struct Graph *self, int start) {
         printf("%d / ", myCircuit->data[i]);
     }
 
-
-
     array_destroy(myCircuit);
 }
 
@@ -477,6 +475,58 @@ void CaseNonEulerian (struct Graph *self, int tabDegree[self->size], int numberO
     printEulerUtil(temp, start);
 }
 
+
+void printTrailSemi(struct Graph *self, int start, int end) {
+    struct Graph *temp = self;
+
+    struct array *myCircuit = malloc(sizeof(struct array));
+
+    array_create(myCircuit);
+
+    int indexSource = findNode(temp, start);
+    int source = start;
+
+    int indexEnd = findNode(temp, end);
+    int finish = start;
+
+    int indexlastNodeSource;
+    int lastNodeSource;
+
+    int indexCurrentNode = indexSource;
+    int currentNode = source;
+
+    do {
+        array_add(myCircuit, indexCurrentNode);
+
+        indexlastNodeSource = indexCurrentNode;
+        lastNodeSource = currentNode;
+
+        currentNode = temp->array[indexCurrentNode].adjList->neighbour;
+        indexCurrentNode = findNode(temp, currentNode);
+
+        browseDelete(temp, indexlastNodeSource, currentNode);
+        browseDelete(temp, indexCurrentNode, lastNodeSource);
+
+    } while (indexCurrentNode != indexEnd);
+
+    array_add(myCircuit, indexEnd);
+
+    for (int i = 0; i < myCircuit->size; i++) {
+        if (temp->array[myCircuit->data[i]].adjList != NULL) {
+            exploreTheNode(temp, myCircuit->data[i], temp->array[myCircuit->data[i]].node, i, myCircuit);
+            i = -1;
+        }
+    }
+    printf("\n\n\n");
+    for (int i = 0; i < myCircuit->size; i++) {
+        printf("%d / ", myCircuit->data[i]);
+    }
+
+
+
+    array_destroy(myCircuit);
+}
+
 void solveChineseProblem(struct Graph *self, int start) {
 
     int numberOddDegree = 0;
@@ -502,23 +552,21 @@ void solveChineseProblem(struct Graph *self, int start) {
     else  {
         if (numberOddDegree == 2) {
 
-            /*int indexStart = findNode(self, start);
-
-            bool oddDegreeStart = false;
+            int start;
+            int end;
+            bool allGoodForStart = false;
             for (int i = 0; i < self->size; i++) {
-                if (tabDegree[i] % 2 != 0 && indexStart == i) {
-
-                    oddDegreeStart = true;
-                    break;
+                if (tabDegree[i] % 2 != 0 && allGoodForStart == false) {
+                    start = self->array[i].node;
+                    allGoodForStart = true;
+                }
+                else if (tabDegree[i] % 2 != 0 && allGoodForStart == true) {
+                    end = self->array[i].node;
                 }
             }
 
-            if (oddDegreeStart == false) {
-                printEulerUtil(self, start);
-            }*/
-            //else {
-                CaseNonEulerian(self, tabDegree, numberOddDegree, start);
-            //}
+            printTrailSemi(self, start, end);
+
         }
         else {
             CaseNonEulerian(self, tabDegree, numberOddDegree, start);
