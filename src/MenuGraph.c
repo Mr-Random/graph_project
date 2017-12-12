@@ -216,7 +216,7 @@ void MenuAddEdge(struct Graph *self) {
         ret3 = sscanf(weight, "%d", &nombreWeight);
     } while (ret3 != 1);
 
-    graph_add_edge(self, nombreNodeSource, nombreNodeDest, nombreWeight, true);
+    graph_add_edge(self, nombreNodeSource, nombreNodeDest, nombreWeight);
 }
 
 void MenuRemoveEdge(struct Graph *self) {

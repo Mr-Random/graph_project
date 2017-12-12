@@ -91,11 +91,6 @@ int main() {
 
     graph_add_edge(myGraph, 1, 4, 5);
 
-
-
-
-
-
     solveChineseProblem(myGraph, 2);
 
     graph_destroy(myGraph);
