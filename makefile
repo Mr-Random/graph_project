@@ -20,7 +20,7 @@ OBJ = $(SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 all: directories $(MAIN)
 
 #principale rule
-$(MAIN): $(OBJ) $(BINDIR) $(LIBDIR)/libLinkedList.a $(LIBDIR)/libGraph.a
+$(MAIN): $(OBJ) $(BINDIR) #$(LIBDIR)/libLinkedList.a $(LIBDIR)/libGraph.a
 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $(OBJ) $(LDLIBS) 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/%.h $(OBJDIR)

@@ -19,11 +19,33 @@
 int main() {
 
     struct Graph *myGraph = malloc(sizeof(struct Graph));
-
-    graph_create(myGraph, 12, false);
+    
+    //graph_create(myGraph, 12, false);
 
 
     //NON EULERIAN
+    /*graph_add_node(myGraph, 0);
+    graph_add_node(myGraph, 1);
+    graph_add_node(myGraph, 2);
+    graph_add_node(myGraph, 3);
+    graph_add_node(myGraph, 4);
+    graph_add_node(myGraph, 5);
+    graph_add_node(myGraph, 6);
+
+
+    graph_add_edge(myGraph, 0, 1, 1);
+    graph_add_edge(myGraph, 0, 2, 2);
+    graph_add_edge(myGraph, 1, 2, 4);
+    graph_add_edge(myGraph, 1, 3, 12);
+    graph_add_edge(myGraph, 2, 3, 4);
+    graph_add_edge(myGraph, 3, 4, 2);
+    graph_add_edge(myGraph, 4, 5, 1);
+    graph_add_edge(myGraph, 5, 6, 1);
+    graph_add_edge(myGraph, 4, 6, 10);*/
+
+
+    //EULERIAN GRAPH
+    /*graph_add_node(myGraph, 0);
     graph_add_node(myGraph, 1);
     graph_add_node(myGraph, 2);
     graph_add_node(myGraph, 3);
@@ -32,60 +54,38 @@ int main() {
     graph_add_node(myGraph, 6);
     graph_add_node(myGraph, 7);
 
-
-    graph_add_edge(myGraph, 1, 2, 1);
-    graph_add_edge(myGraph, 1, 3, 2);
-    graph_add_edge(myGraph, 2, 3, 4);
-    graph_add_edge(myGraph, 2, 4, 12);
-    graph_add_edge(myGraph, 3, 4, 4);
-    graph_add_edge(myGraph, 4, 5, 2);
-    graph_add_edge(myGraph, 5, 6, 1);
-    graph_add_edge(myGraph, 6, 7, 1);
-    graph_add_edge(myGraph, 5, 7, 10);
-
-
-    //EULERIAN GRAPH
-    /*graph_add_node(myGraph, 1);
-    graph_add_node(myGraph, 2);
-    graph_add_node(myGraph, 3);
-    graph_add_node(myGraph, 4);
-    graph_add_node(myGraph, 5);
-    graph_add_node(myGraph, 6);
-    graph_add_node(myGraph, 7);
-    graph_add_node(myGraph, 8);
-
+    graph_add_edge(myGraph, 0, 1, 5);
+    graph_add_edge(myGraph, 0, 2, 5);
     graph_add_edge(myGraph, 1, 2, 5);
-    graph_add_edge(myGraph, 1, 3, 5);
+
     graph_add_edge(myGraph, 2, 3, 5);
+    graph_add_edge(myGraph, 2, 4, 5);
 
-    graph_add_edge(myGraph, 3, 4, 5);
     graph_add_edge(myGraph, 3, 5, 5);
+    graph_add_edge(myGraph, 4, 5, 5);
 
-    graph_add_edge(myGraph, 4, 6, 5);
     graph_add_edge(myGraph, 5, 6, 5);
-
-    graph_add_edge(myGraph, 6, 7, 5);
-    graph_add_edge(myGraph, 6, 8, 5);
-    graph_add_edge(myGraph, 7, 8, 5);*/
+    graph_add_edge(myGraph, 5, 7, 5);
+    graph_add_edge(myGraph, 6, 7, 5);*/
 
 
 
     //SEMI EULERIAN
-    /*graph_add_node(myGraph, 1);
+    /*graph_add_node(myGraph, 0);
+    graph_add_node(myGraph, 1);
     graph_add_node(myGraph, 2);
     graph_add_node(myGraph, 3);
     graph_add_node(myGraph, 4);
-    graph_add_node(myGraph, 5);
 
+    graph_add_edge(myGraph, 0, 1, 5);
+    graph_add_edge(myGraph, 0, 2, 5);
     graph_add_edge(myGraph, 1, 2, 5);
-    graph_add_edge(myGraph, 1, 3, 5);
+
     graph_add_edge(myGraph, 2, 3, 5);
-
+    graph_add_edge(myGraph, 2, 4, 5);
     graph_add_edge(myGraph, 3, 4, 5);
-    graph_add_edge(myGraph, 3, 5, 5);
-    graph_add_edge(myGraph, 4, 5, 5);
 
-    graph_add_edge(myGraph, 1, 4, 5);*/
+    graph_add_edge(myGraph, 0, 3, 5);*/
 
 
     // Test 6 ODD Degree //
@@ -109,11 +109,11 @@ int main() {
     graph_add_edge(myGraph, 5, 7, 2);    
     graph_add_edge(myGraph, 6, 7, 3);*/
 
-    solveChineseProblem(myGraph, 2);
+    //solveChineseProblem(myGraph, 2);
 
-    graph_destroy(myGraph);
+    //graph_destroy(myGraph);
 
-    //MainMenu(&myGraph);
+    MainMenu(myGraph);
 
     free(myGraph);
 }

@@ -94,7 +94,7 @@ void knowTheDegree(struct Graph *self, int tabDegree[]) {
 void knowTabOdd(struct Graph *self, int myTabOdd[], int tabDegree[]) {
     int j = 0;
     for (int i = 0; i < self->size; i++) {
-        printf("[%d] = %d\n", i, tabDegree[i]);
+        //printf("[%d] = %d\n", i, tabDegree[i]);
         if (tabDegree[i] % 2 != 0) {
             myTabOdd[j] = i;
             j++;
@@ -398,9 +398,13 @@ void printEulerUtil(struct Graph *self, int start) {
             i = -1;
         }
     }
-    printf("\n\n\n");
+    
     for (int i = 0; i < myCircuit->size; i++) {
-        printf("%d / ", myCircuit->data[i]);
+        if(i == myCircuit->size-1){
+            printf("%d \n", myCircuit->data[i]);
+        }else{
+            printf("%d --> ", myCircuit->data[i]);
+        }
     }
 
     array_destroy(myCircuit);
@@ -415,7 +419,8 @@ void CaseNonEulerian (struct Graph *self, int tabDegree[self->size], int numberO
         knowTabOdd(self, myTabOdd, tabDegree);
 
         /* Heuristic */
-        if(numberOddDegree > 10){
+        if(numberOddDegree > 5){
+
             int node1;
             int node2;
             int tmp = 1;
@@ -429,6 +434,15 @@ void CaseNonEulerian (struct Graph *self, int tabDegree[self->size], int numberO
                     tmp = 1;
                 }
             }
+
+            printf("\n\n ---> Graph Before add edge <--- \n\n");
+            graph_print(self);
+            
+            printf("\n\n----> Graph After add edge <---\n\n");
+            graph_print(self);
+
+            printf("\n\n Heuristic Perso (circuit) :  ");
+            printEulerUtil(self, start);
             return;
         }
     
@@ -463,8 +477,10 @@ void CaseNonEulerian (struct Graph *self, int tabDegree[self->size], int numberO
         memset(distance, 0, self->size*self->size*sizeof(int) );
     
         FloydWarshall(self, myMatrix, distance);
-    
-    
+        printf("\n\n ---> Graph Before add edge <--- \n\n");
+        graph_print(self);
+
+        printf("\n\n\n");
         int indexMinimumPairing = GetIndexMinimumPairing(self, distance, numberOfPossiblePairings, numberOddDegree/2, myTabPairing);
 
         struct Graph *temp = self;
@@ -488,6 +504,9 @@ void CaseNonEulerian (struct Graph *self, int tabDegree[self->size], int numberO
             path_destroy(myPath);
             free(myPath);
         }
+        printf("----> Graph After add edge <---\n\n");
+        graph_print(temp);
+    printf("\n\n Floyad-Warshall (circuit) :  ");
     printEulerUtil(temp, start);
 }
 
@@ -533,12 +552,15 @@ void printTrailSemi(struct Graph *self, int start, int end) {
             i = -1;
         }
     }
-    printf("\n\n\n");
+    printf("\n\n === Graph is Semi-Eulerian ! ===\n\n");
+    printf("Trail : ");
     for (int i = 0; i < myCircuit->size; i++) {
-        printf("%d / ", myCircuit->data[i]);
+        if(i == myCircuit->size-1){
+            printf("%d \n", myCircuit->data[i]);
+        }else{
+            printf("%d --> ", myCircuit->data[i]);
+        }
     }
-
-
 
     array_destroy(myCircuit);
 }
@@ -559,10 +581,11 @@ void solveChineseProblem(struct Graph *self, int start) {
     }
 
 
-
     //Eulerian
     if (numberOddDegree == 0) {
-            printEulerUtil(self, start);
+        printf("\n\n === Graph is already Eulerian ! ===");
+        printf("\n\n Circuit : ");
+        printEulerUtil(self, start);
     }
     else  {
         if (numberOddDegree == 2) {
@@ -581,16 +604,12 @@ void solveChineseProblem(struct Graph *self, int start) {
             }
 
             printTrailSemi(self, start, end);
-
         }
         else {
+            printf("\n\n===== Graph is not eulerian =====\n");
             CaseNonEulerian(self, tabDegree, numberOddDegree, start);
         }
     }
-
-
-
-
 }
 
 

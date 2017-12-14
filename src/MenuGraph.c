@@ -1,6 +1,7 @@
 // File that contains the functions used to display the menu //
 
 #include "MenuGraph.h"
+#include "Chinese.h"
 
 void MainMenu(struct Graph *self){
     char choice;
@@ -11,13 +12,18 @@ void MainMenu(struct Graph *self){
     printf("2 | Remove node \n");
     printf("3 | Add Edge \n");
     printf("4 | Remove Edge \n");
-    printf("5 | Load Graph \n");
-    printf("6 | Save Graph \n");
-    printf("7 | View Graph \n");
-    printf("8 | Exit\n");
+    printf("5 | Save Graph \n");
+    printf("\n");
+    printf("6 | Load Non-Eulerian Graph : noneulerian.txt \n");
+    printf("7 | Load Semi-Eulerian Graph : semieulerian.txt \n");
+    printf("8 | Load Eulerian Graph : eulerian.txt \n");
+    printf("9 | Load 'Heuristic' Graph : heuristicgraph.txt \n");
+    printf("\n");
+    printf("s | Solve Chinese \n");
+    //printf("v | View Graph \n");
+    printf("\nq | Exit \n");
 
     choice = fgetc(stdin);
-
 
     switch(choice){
         case '0':
@@ -46,31 +52,47 @@ void MainMenu(struct Graph *self){
             break;
 
         case '5':
-            MenuLoadGraph(self);
-            MainMenu(self);
-            break;
-
-        case '6':
             MenuSaveGraph(self);
             MainMenu(self);
             break;
 
+        case '6':
+            MenuLoadGraphV2(self,"../noneulerian.txt");
+            MainMenu(self);
+            break;
+
         case '7':
+            MenuLoadGraphV2(self,"../semieulerian.txt");
+            MainMenu(self);
+            break;
+
+        case '8':
+            MenuLoadGraphV2(self,"../eulerian.txt");
+            MainMenu(self);
+            break;
+
+        case '9':
+            MenuLoadGraphV2(self,"../heuristicgraph.txt");
+            MainMenu(self);
+            break;
+
+        case 's':
+            solveChineseProblem(self, 2);
+            return;
+
+        case 'v':
             graph_print(self);
             MainMenu(self);
             break;
 
-        case '8':;
+        case 'q':
             graph_destroy(self);
             return;
 
         default:
             MainMenu(self);
             break;
-
     }
-
-
 }
 
 void purger(void){
@@ -265,6 +287,14 @@ void MenuLoadGraph(struct Graph *self) {
     scanf("%s",maxLink);
 
     graph_load(maxLink, self);
+}
+
+void MenuLoadGraphV2(struct Graph *self, char* filename){
+    graph_destroy(self);
+
+    printf("=== Loading Graph ===\n\n");
+
+    graph_load(filename, self);
 }
 
 void MenuSaveGraph(struct Graph *self) {

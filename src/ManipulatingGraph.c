@@ -340,7 +340,7 @@ void getEdge(struct Graph *self,char* line){
             printf("Weight = %d\n",weight);
             
             /* Add new Edge */
-            graph_add_edge(self,currentNode,neighbour,weight);
+            browseAdd(self,currentNode,neighbour,weight);
 
             printf("\n");
         }
